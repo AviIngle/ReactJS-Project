@@ -1,0 +1,88 @@
+*{
+  margin:0px;
+  padding: 0px;
+}
+
+.container{
+  margin: 0 auto;
+  padding: 60px 0px 0px 0px;
+  text-align: center;
+  display: flex;
+  justify-content: space-evenly;
+  /* align-items: center; */
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 0px;
+
+}
+#card{
+width: 400px;
+padding: 10px;
+margin: 20px;
+background-color: green;
+color: #fff;
+
+
+}
+#card img{
+
+  width: 400px; 
+  padding-bottom: 8px;
+  
+}
+
+/* Hrader Css */
+
+.header{
+  background-color: #0766AD;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0px 20px 20px;
+}
+.logo{
+  max-width: 20%;
+  color: #fff;
+}
+.menu ul{
+  width: 80%;
+  display: flex;
+  justify-content: space-evenly
+  
+  
+}
+li{
+  list-style: none;
+  padding-left: 25px;
+}
+li a{
+  text-decoration: none;
+  font-size: 25px;
+  color:#000
+}
+li a:hover{
+  background-color: #FF8F8F;
+  padding: 5px;
+  border-radius: 30px;
+}
+
+/* Hero Image CSS */
+
+.heroimage{
+  /* background-color:#DC8686; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("https://images.unsplash.com/photo-1701854711357-ac1374019816?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  box-shadow: inset 0 0 0 2000px rgba(21, 19, 20, 0.681);
+  height: 600px;
+  
+
+}
+.heroimage h2{
+  font-size: 50px;
+  color: white;
+}
