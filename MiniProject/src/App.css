@@ -21,68 +21,88 @@ padding: 10px;
 margin: 20px;
 background-color: green;
 color: #fff;
-
+border-radius: 20px;
 
 }
 #card img{
 
   width: 400px; 
   padding-bottom: 8px;
-  
+  border-radius: 20px;
 }
 
-/* Hrader Css */
+/* Header CSS */
 
-.header{
+.header {
   background-color: #0766AD;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0px 20px 20px;
+  padding: 20px;
 }
-.logo{
+
+.logo {
   max-width: 20%;
   color: #fff;
 }
-.menu ul{
-  width: 80%;
+
+.menu ul {
   display: flex;
-  justify-content: space-evenly
-  
-  
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 10px;
 }
-li{
+
+li {
   list-style: none;
-  padding-left: 25px;
+  padding-left: 0;
 }
-li a{
+
+li a {
+  display: inline-block;
   text-decoration: none;
   font-size: 25px;
-  color:#000
-}
-li a:hover{
-  background-color: #FF8F8F;
-  padding: 5px;
+  color: #fff;
+
+  /* Keep the size consistent */
+  padding: 5px 12px;
   border-radius: 30px;
+  box-sizing: border-box;
+
+  /* Smooth hover effect */
+  transition: background-color 0.3s ease;
+}
+
+li a:hover {
+  background-color: #FF8F8F;
 }
 
 /* Hero Image CSS */
 
-.heroimage{
-  /* background-color:#DC8686; */
+
+.heroimage {
   display: flex;
+  flex-direction: column; /* Headings ko new line mein karega */
   align-items: center;
   justify-content: center;
-  background-image: url("https://images.unsplash.com/photo-1701854711357-ac1374019816?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+
+  background-image: url("https://images.unsplash.com/photo-1701854711357-ac1374019816?q=80&w=2070&auto=format&fit=crop");
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-size: cover;
   box-shadow: inset 0 0 0 2000px rgba(21, 19, 20, 0.681);
   height: 600px;
-  
+}
 
-}
-.heroimage h2{
-  font-size: 50px;
+.heroimage h1
+{
   color: white;
+  text-align: center;
+  font-size: 80px;
 }
+.heroimage h2 {
+  color: white;
+  text-align: center;
+  font-size: 50px;
+}
+

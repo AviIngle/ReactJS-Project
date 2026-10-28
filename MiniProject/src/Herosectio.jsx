@@ -3,7 +3,9 @@ import React from 'react'
 const Herosectio = () => {
   return (
     <div className='heroimage'>
-    <h2>You Can Get World <br></br>Best Status from here</h2>
+    <h1>You Can Get World </h1>
+    <h2>Best Status Srom Here</h2>
+    
     </div>
   )
 }
