@@ -3,18 +3,34 @@ import { useEffect, useState } from 'react';
 import './App.css';
 
 import Card from './Card';
-import data from './CardData';
 import Header from './Header';
 import Herosectio from './Herosectio';
 import Auth from './Auth';
+import AdminSettings from './AdminSettings';
+import AdminEarnings from './AdminEarnings';
 import { supabase } from './supabase';
 
 function App() {
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [adminChecking, setAdminChecking] = useState(true);
+
+  const [showAdminSettings, setShowAdminSettings] = useState(false);
+  const [showAdminEarnings, setShowAdminEarnings] = useState(false);
+
   const [uploadedImages, setUploadedImages] = useState([]);
   const [likedImageIds, setLikedImageIds] = useState([]);
   const [busyLikeIds, setBusyLikeIds] = useState([]);
+  const [earningRequestedIds, setEarningRequestedIds] = useState([]);
+
+  const [settings, setSettings] = useState({
+    likes_target: 100,
+    downloads_target: 50,
+    shares_target: 30,
+    reward_amount: 100,
+  });
+
   const [loadingImages, setLoadingImages] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -40,23 +56,88 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch images from Supabase
-  const fetchImages = async () => {
-    setLoadingImages(true);
+  // Check whether current user is Admin
+  useEffect(() => {
+    let active = true;
 
-    const { data: images, error } = await supabase
-      .from('images')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const checkAdmin = async () => {
+      setAdminChecking(true);
+      setIsAdmin(false);
+      setShowAdminSettings(false);
+      setShowAdminEarnings(false);
+
+      if (!session?.user?.id) {
+        setAdminChecking(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('admin_users')
+        .select('user_id')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (!active) return;
+
+      if (error) {
+        console.error('Admin check error:', error.message);
+      } else {
+        setIsAdmin(!!data);
+      }
+
+      setAdminChecking(false);
+    };
+
+    checkAdmin();
+
+    return () => {
+      active = false;
+    };
+  }, [session]);
+
+  // Fetch Admin settings
+  const fetchSettings = async () => {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('likes_target, downloads_target, shares_target, reward_amount')
+      .eq('id', 1)
+      .single();
 
     if (error) {
-      console.error('Image loading error:', error.message);
-      alert(error.message);
-    } else {
-      setUploadedImages(images || []);
+      console.error('Settings loading error:', error.message);
+      return;
     }
 
-    setLoadingImages(false);
+    if (data) {
+      setSettings(data);
+    }
+  };
+
+  // Fetch images without disturbing the gallery layout
+  const fetchImages = async (showLoader = false) => {
+    if (showLoader) {
+      setLoadingImages(true);
+    }
+
+    try {
+      const { data: images, error } = await supabase
+        .from('images')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Image loading error:', error.message);
+        return;
+      }
+
+      setUploadedImages(images || []);
+    } catch (error) {
+      console.error('Image loading error:', error.message);
+    } finally {
+      if (showLoader) {
+        setLoadingImages(false);
+      }
+    }
   };
 
   // Fetch current user's Like records
@@ -77,14 +158,36 @@ function App() {
     setLikedImageIds((actions || []).map((action) => action.image_id));
   };
 
-  // Load images after login
+  // Fetch earning requests already submitted by this user
+  const fetchEarningRequests = async () => {
+    if (!session?.user?.id) return;
+
+    const { data: requests, error } = await supabase
+      .from('earning_requests')
+      .select('image_id')
+      .eq('user_id', session.user.id);
+
+    if (error) {
+      console.error('Earning requests loading error:', error.message);
+      return;
+    }
+
+    setEarningRequestedIds(
+      (requests || []).map((request) => request.image_id)
+    );
+  };
+
+  // Load data after login
   useEffect(() => {
-    if (session) {
-      fetchImages();
+    if (session?.user?.id) {
+      fetchImages(true);
       fetchLikedImages();
+      fetchSettings();
+      fetchEarningRequests();
     } else {
       setUploadedImages([]);
       setLikedImageIds([]);
+      setEarningRequestedIds([]);
     }
   }, [session]);
 
@@ -118,7 +221,7 @@ function App() {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
       alert('Image size 2 MB se kam honi chahiye!');
       return;
     }
@@ -158,6 +261,7 @@ function App() {
       alert('Image uploaded successfully!');
       form.reset();
       await fetchImages();
+
     } catch (error) {
       console.error('Upload error:', error.message);
       alert(error.message);
@@ -201,7 +305,11 @@ function App() {
         if (error) throw error;
       }
 
-      await Promise.all([fetchImages(), fetchLikedImages()]);
+      await Promise.all([
+        fetchImages(),
+        fetchLikedImages(),
+      ]);
+
     } catch (error) {
       console.error('Like error:', error.message);
       alert('Like update nahi hua: ' + error.message);
@@ -235,6 +343,7 @@ function App() {
       }
 
       await fetchImages();
+
     } catch (error) {
       console.error(`${actionType} counter error:`, error.message);
       alert(`${actionType} count update nahi hua: ${error.message}`);
@@ -247,6 +356,59 @@ function App() {
 
   const handleDownload = (image) => {
     handleImageAction(image, 'download');
+  };
+
+  // Submit earning request securely through Supabase function
+  const handleRequestEarning = async (image, upiId, phoneNumber) => {
+    if (image.isSample) {
+      alert('Sample images ke liye earning request nahi kar sakte.');
+      return;
+    }
+
+    if (image.user_id !== session.user.id) {
+      alert('Sirf apni uploaded image ke liye request kar sakte hain.');
+      return;
+    }
+
+    if (earningRequestedIds.includes(image.id)) {
+      alert('Is image ki earning request pehle se submit hai.');
+      return;
+    }
+
+    if (!upiId?.trim() || !phoneNumber?.trim()) {
+      alert('UPI ID aur mobile number dono enter karein.');
+      return;
+    }
+
+    const phoneDigits = phoneNumber.replace(/\D/g, '');
+
+    if (phoneDigits.length !== 10) {
+      alert('Valid 10 digit mobile number enter karein.');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.rpc(
+        'request_image_earning',
+        {
+          p_image_id: image.id,
+          p_upi_id: upiId.trim(),
+          p_phone_number: phoneDigits,
+        }
+      );
+
+      if (error) throw error;
+
+      setEarningRequestedIds((previous) => [...previous, image.id]);
+
+      alert('Earning request successfully submitted! Status: Pending.');
+
+      await fetchEarningRequests();
+
+    } catch (error) {
+      console.error('Earning request error:', error.message);
+      alert('Earning request failed: ' + error.message);
+    }
   };
 
   // Delete image
@@ -286,21 +448,11 @@ function App() {
       if (databaseError) throw databaseError;
 
       await fetchImages();
+
     } catch (error) {
       alert('Delete error: ' + error.message);
     }
   };
-
-  // Sample images
-  const sampleImages = data.map((ele) => ({
-    id: ele.Image,
-    image_url: ele.Image,
-    user_id: null,
-    author_name: ele.Name,
-    isSample: true,
-  }));
-
-  const allImages = [...sampleImages, ...uploadedImages];
 
   if (authLoading) {
     return <h2>Loading...</h2>;
@@ -317,10 +469,46 @@ function App() {
 
       <div className="user-bar">
         <span>Logged in: {session.user.email}</span>
+
+        {isAdmin && !adminChecking && (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowAdminSettings(!showAdminSettings)}
+            >
+              {showAdminSettings ? 'Close Admin Settings' : 'Admin Settings'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowAdminEarnings(!showAdminEarnings)}
+            >
+              {showAdminEarnings
+                ? 'Close Earning Dashboard'
+                : 'Earning Dashboard'}
+            </button>
+          </>
+        )}
+
         <button type="button" onClick={handleLogout}>
           Logout
         </button>
       </div>
+
+      {showAdminSettings && isAdmin && (
+        <AdminSettings
+          onClose={() => {
+            setShowAdminSettings(false);
+            fetchSettings();
+          }}
+        />
+      )}
+
+      {showAdminEarnings && isAdmin && (
+        <AdminEarnings
+          onClose={() => setShowAdminEarnings(false)}
+        />
+      )}
 
       <section className="upload-section">
         <h1>Upload Your Status Image & Earn Money</h1>
@@ -358,9 +546,9 @@ function App() {
         <p>Loading images...</p>
       ) : (
         <div className="container">
-          {allImages.map((ele, index) => (
+          {uploadedImages.map((ele) => (
             <Card
-              key={`${ele.isSample ? 'sample' : 'uploaded'}-${ele.id}-${index}`}
+              key={ele.id}
               Img={ele.image_url}
               count={ele.downloads_count || 0}
               shareCount={ele.shares_count || 0}
@@ -370,10 +558,18 @@ function App() {
               canLike={!ele.isSample}
               authorName={ele.author_name}
               canDelete={ele.user_id === session.user.id}
+              likesTarget={settings.likes_target}
+              downloadsTarget={settings.downloads_target}
+              sharesTarget={settings.shares_target}
+              rewardAmount={settings.reward_amount}
+              earningRequested={earningRequestedIds.includes(ele.id)}
               onLike={() => handleLike(ele)}
               onDownload={() => handleDownload(ele)}
               onShare={() => handleShare(ele)}
               onDelete={() => handleDelete(ele)}
+              onRequestEarning={(upiId, phoneNumber) =>
+                handleRequestEarning(ele, upiId, phoneNumber)
+              }
             />
           ))}
         </div>

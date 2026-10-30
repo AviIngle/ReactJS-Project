@@ -1,19 +1,18 @@
-*{
-  margin:0px;
+
+* {
+  margin: 0px;
   padding: 0px;
 }
 
 /* ==========================
-Hero Image CSS
-=============================*/ 
-
+   Hero Image CSS
+=============================*/
 
 .heroimage {
   display: flex;
-  flex-direction: column; /* Headings ko new line mein karega */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-
   background-image: url("https://images.unsplash.com/photo-1701854711357-ac1374019816?q=80&w=2070&auto=format&fit=crop");
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -22,21 +21,48 @@ Hero Image CSS
   height: 600px;
 }
 
-.heroimage h1
-{
+.heroimage h1 {
   color: white;
   text-align: center;
   font-size: 80px;
 }
+
 .heroimage h2 {
   color: white;
   text-align: center;
   font-size: 50px;
 }
+@media (min-width: 390px) and (max-width: 1000px) {
 
+  .heroimage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-image: url("https://images.unsplash.com/photo-1701854711357-ac1374019816?q=80&w=2070&auto=format&fit=crop");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  box-shadow: inset 0 0 0 2000px rgba(21, 19, 20, 0.681);
+  height: 400px;
+}
+
+.heroimage h1 {
+  color: white;
+  text-align: center;
+  font-size: 80px;
+}
+
+.heroimage h2 {
+  color: white;
+  text-align: center;
+  font-size: 35px;
+}
+}
 /* ==========================
-Header CSS 
+   Header CSS
 =============================*/
+
 .header {
   background-color: #0766AD;
   display: flex;
@@ -45,14 +71,16 @@ Header CSS
   padding: 20px;
 }
 
-.logo img{
+.logo img {
   max-width: 25%;
 }
+
 @media (max-width: 900px) {
   .logo img {
     max-width: 40%;
   }
 }
+
 .menu ul {
   display: flex;
   justify-content: space-evenly;
@@ -70,21 +98,18 @@ li a {
   text-decoration: none;
   font-size: 25px;
   color: #fff;
-
-  /* Keep the size consistent */
   padding: 5px 12px;
   border-radius: 30px;
   box-sizing: border-box;
-
-  /* Smooth hover effect */
   transition: background-color 0.3s ease;
 }
+
 @media (max-width: 900px) {
- li a {
-  display: inline-block;
-  text-decoration: none;
-  font-size: 18px;
-  color: #fff;
+  li a {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 18px;
+    color: #fff;
   }
 }
 
@@ -93,11 +118,8 @@ li a:hover {
 }
 
 /* ==========================
-Gallery Container 
+   Gallery Container
 =============================*/
-
-
-/* Gallery Container */
 
 .container {
   display: flex;
@@ -109,7 +131,7 @@ Gallery Container
   box-sizing: border-box;
 }
 
-/* Image Card - Desktop: 3 Images */
+/* Desktop: 3 Images */
 
 .image-card {
   flex: 0 0 calc(33.333% - 17px);
@@ -147,7 +169,7 @@ Gallery Container
   }
 }
 
-/* Mobile: Only 1 Image */
+/* Mobile: 1 Image */
 
 @media (max-width: 600px) {
   .container {
@@ -165,8 +187,9 @@ Gallery Container
   }
 }
 
-/* Card Actions */
-
+/* ==========================
+   Card Actions
+=============================*/
 
 .card-actions {
   display: flex;
@@ -177,7 +200,8 @@ Gallery Container
   padding-top: 12px;
 }
 
-/* Download - Left */
+/* Download Button */
+
 .download-btn {
   background: #0766AD;
   color: white;
@@ -194,7 +218,8 @@ Gallery Container
   background: #054d85;
 }
 
-/* Counter + Delete - Right */
+/* Right Actions */
+
 .right-actions {
   display: flex;
   align-items: center;
@@ -224,28 +249,6 @@ Gallery Container
 
 .delete-btn:hover {
   color: #a50000;
-}
-
-/* Mobile */
-@media (max-width: 1000px) {
-  .card-actions {
-    justify-content: space-between;
-    gap: 5px;
-  }
-
-  .download-btn {
-    padding: 9px 12px;
-    font-size: 13px;
-  }
-
-  .right-actions {
-    margin-left: auto;
-    gap: 7px;
-  }
-
-  .download-count {
-    font-size: 14px;
-  }
 }
 
 /* Like and Share Actions */
@@ -296,22 +299,91 @@ Gallery Container
   margin: 10px 0;
 }
 
-/* Mobile Card Actions */
+/* Tablet Card Actions */
 
-@media (max-width: 600px) {
+@media (max-width: 1000px) {
   .card-actions {
-    flex-wrap: wrap;
-    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
   }
 
-  .left-actions,
+  .download-btn {
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
   .right-actions {
-    width: 100%;
-    justify-content: space-between;
+    margin-left: auto;
+    gap: 7px;
+  }
+
+  .download-count {
+    font-size: 14px;
   }
 }
 
-/* Upload Section */
+/* MOBILE CARD ACTIONS - ALL IN ONE LINE */
+
+@media (max-width: 600px) {
+  .card-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 5px;
+    width: 100%;
+  }
+
+  .left-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: auto;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .right-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    width: auto;
+    margin-left: 0;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .like-btn,
+  .share-btn,
+  .download-btn {
+    padding: 7px 7px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .like-count,
+  .share-count,
+  .download-count {
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .delete-btn {
+    padding: 4px;
+    flex-shrink: 0;
+  }
+}
+
+/* ==========================
+   Upload Section
+=============================*/
 
 .upload-section {
   width: 100%;
@@ -369,7 +441,7 @@ Gallery Container
   margin-top: 12px;
 }
 
-/* 50 Downloads Milestone */
+/* Milestone Message */
 
 .milestone-message {
   margin-top: 12px;
@@ -399,8 +471,9 @@ Gallery Container
   }
 }
 
-
-/* LOGIN AND SIGNUP PAGE */
+/* ==========================
+   Login and Signup Page
+=============================*/
 
 .auth-container {
   min-height: 100vh;
@@ -478,4 +551,317 @@ Gallery Container
   color: #667eea;
   font-weight: bold;
   cursor: pointer;
+}
+
+/* ==========================
+   Modern User Bar
+=============================*/
+
+.user-bar {
+  width: 100%;
+  min-height: 76px;
+  padding: 14px 5%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  background: linear-gradient(120deg, #111827, #1e293b);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.18);
+}
+
+.user-bar span {
+  color: #e2e8f0;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.user-bar button {
+  padding: 11px 19px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.user-bar button:first-of-type {
+  color: white;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.user-bar button:first-of-type:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+.user-bar button:last-of-type {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.13);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+}
+
+.user-bar button:last-of-type:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* ==========================
+   Admin Settings Popup
+=============================*/
+
+.admin-settings {
+  position: fixed;
+  z-index: 1000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(460px, calc(100% - 32px));
+  max-height: 85vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 30px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 0 0 100vmax rgba(15, 23, 42, 0.65),
+              0 20px 60px rgba(0, 0, 0, 0.25);
+  font-family: Arial, sans-serif;
+}
+
+.admin-settings h2 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.admin-settings p {
+  margin: 0 0 25px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.admin-settings form {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+.admin-settings label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.admin-settings input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 15px;
+  transition: 0.2s ease;
+}
+
+.admin-settings input:focus {
+  border-color: #6366f1;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.13);
+}
+
+.admin-settings form button {
+  padding: 13px 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.admin-settings form button[type="submit"] {
+  margin-top: 5px;
+  color: white;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+}
+
+.admin-settings form button[type="submit"]:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
+.admin-settings form button[type="button"] {
+  color: #475569;
+  background: #f1f5f9;
+}
+
+.admin-settings form button[type="button"]:hover {
+  background: #e2e8f0;
+}
+
+.admin-settings button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile Responsive */
+
+@media (max-width: 600px) {
+  .user-bar {
+    justify-content: center;
+    padding: 15px 12px;
+    gap: 9px;
+  }
+
+  .user-bar span {
+    width: 100%;
+    text-align: center;
+  }
+
+  .user-bar button {
+    padding: 10px 14px;
+  }
+
+  .admin-settings {
+    padding: 23px 19px;
+    border-radius: 16px;
+  }
+
+  .admin-settings h2 {
+    font-size: 22px;
+  }
+}
+
+/* ==========================
+   Earning Progress
+=============================*/
+
+.earning-progress {
+  margin-top: 24px;
+  padding: 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.05);
+}
+
+.earning-progress h3 {
+  margin: 0 0 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 17px;
+  color: #172033;
+}
+
+.earning-progress-item {
+  margin-bottom: 17px;
+}
+
+.earning-progress-heading {
+  margin-bottom: 9px;
+  font-size: 13px;
+}
+
+.earning-progress-track {
+  height: 8px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #e2e8f0;
+}
+
+.earning-progress-fill {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 0.4s ease;
+}
+
+.earning-progress-fill.completed {
+  background: #16a36a;
+}
+
+.earning-reward {
+  margin-top: 20px;
+  padding: 15px;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  border-radius: 13px;
+}
+
+.earning-completed {
+  margin-top: 14px;
+  padding: 11px;
+  border-radius: 10px;
+  background: #dcfce7;
+  color: #166534;
+  text-align: center;
+}
+
+.request-earning-btn {
+  width: 100%;
+  margin-top: 15px;
+  padding: 13px;
+  border-radius: 12px;
+}
+
+@media (max-width: 480px) {
+  .earning-progress {
+    margin-top: 20px;
+    padding: 15px;
+  }
+}
+
+
+/* Card Actions Responsive Fix: 601px to 1200px */
+
+@media (min-width: 601px) and (max-width: 1200px) {
+  .card-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .left-actions,
+  .right-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    width: auto;
+    margin-left: 0;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .like-btn,
+  .share-btn,
+  .download-btn {
+    padding: 8px 7px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .like-count,
+  .share-count,
+  .download-count {
+    font-size: 12px;
+    white-space: nowrap;
+  }
 }
