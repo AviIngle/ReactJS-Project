@@ -1,6 +1,7 @@
 
 import { Link } from "react-router-dom";
 import "./Footer.css";
+import logo from './assets/logo (1).png';
 
 function Footer() {
   return (
@@ -10,10 +11,7 @@ function Footer() {
         {/* Logo and Description */}
         <div className="footer-section">
           <Link to="/" className="logo footer-logo" aria-label="Go to Home">
-            <img
-              src="/src/assets/logo (1).png"
-              alt="My Gallery Logo"
-            />
+            <img src={logo} alt="Logo" />
           </Link>
 
           <p>
