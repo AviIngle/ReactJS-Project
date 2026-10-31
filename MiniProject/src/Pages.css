@@ -990,13 +990,14 @@
   }
 
   .services-hero {
-    min-height: 550px;
+    min-height: 400px;
     padding: 125px 18px 75px;
     background-position: center;
   }
 
   .services-hero-content {
     width: 100%;
+    padding: 20px;
   }
 
   .services-hero-overlay {
