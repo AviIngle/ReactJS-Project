@@ -10,7 +10,7 @@ import Auth from './Auth';
 import AdminSettings from './AdminSettings';
 import AdminEarnings from './AdminEarnings';
 import { supabase } from './supabase';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import About from './About';
 import Services from './Services';
 import Contact from './Contact';
@@ -595,7 +595,7 @@ function HomePage() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<About />} />
@@ -605,9 +605,8 @@ function App() {
       </Routes>
 
       <Footer />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
 export default App;
-
