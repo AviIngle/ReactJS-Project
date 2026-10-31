@@ -14,7 +14,7 @@ function AdminEarnings({ onClose }) {
     const { data, error } = await supabase
       .from('earning_requests')
       .select(
-        'id, image_id, user_id, upi_id, phone_number, requested_amount, status, created_at'
+        'id, image_id, user_id, upi_id, phone_number, requested_amount, status, created_at, paid_at, rejected_at'
       )
       .order('created_at', { ascending: false });
 
@@ -32,6 +32,7 @@ function AdminEarnings({ onClose }) {
     fetchRequests();
   }, []);
 
+  // Approve / Reject request
   const updateStatus = async (requestId, newStatus) => {
     const confirmed = window.confirm(
       `Kya aap is request ko ${newStatus} karna chahte hain?`
@@ -62,6 +63,36 @@ function AdminEarnings({ onClose }) {
     }
   };
 
+  // Mark payment done
+  const markPaymentDone = async (requestId) => {
+    const confirmed = window.confirm(
+      'Kya aapne is user ko UPI payment kar di hai? Payment Done mark karne ke baad 5 din mein request automatically delete ho jayegi.'
+    );
+
+    if (!confirmed) return;
+
+    setUpdatingId(requestId);
+
+    try {
+      const { error } = await supabase.rpc(
+        'mark_earning_payment_done',
+        {
+          p_request_id: requestId,
+        }
+      );
+
+      if (error) throw error;
+
+      alert('Payment Done successfully! 5 din ka timer shuru ho gaya hai.');
+      await fetchRequests();
+    } catch (error) {
+      console.error('Payment update error:', error.message);
+      alert('Payment status update nahi hua: ' + error.message);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const filteredRequests =
     filter === 'All'
       ? requests
@@ -78,6 +109,31 @@ function AdminEarnings({ onClose }) {
   const rejectedCount = requests.filter(
     (request) => request.status === 'Rejected'
   ).length;
+
+  const paymentDoneCount = requests.filter(
+    (request) => request.status === 'Payment Done'
+  ).length;
+
+  const buttonStyle = {
+    padding: '9px 14px',
+    border: 'none',
+    borderRadius: '6px',
+    color: '#fff',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+  };
+
+  const formatDate = (date) => {
+    if (!date) return 'Not available';
+    return new Date(date).toLocaleString();
+  };
+
+  const statusColor = (status) => {
+    if (status === 'Approved') return '#198754';
+    if (status === 'Rejected') return '#dc3545';
+    if (status === 'Payment Done') return '#087f5b';
+    return '#d97706';
+  };
 
   return (
     <div
@@ -128,19 +184,15 @@ function AdminEarnings({ onClose }) {
             type="button"
             onClick={onClose}
             style={{
-              border: 'none',
+              ...buttonStyle,
               background: '#dc3545',
-              color: '#fff',
-              borderRadius: '7px',
-              padding: '9px 14px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
             }}
           >
             ✕ Close
           </button>
         </div>
 
+        {/* Request counts */}
         <div
           style={{
             display: 'flex',
@@ -153,8 +205,12 @@ function AdminEarnings({ onClose }) {
           <div>Pending: <strong>{pendingCount}</strong></div>
           <div>Approved: <strong>{approvedCount}</strong></div>
           <div>Rejected: <strong>{rejectedCount}</strong></div>
+          <div>
+            Payment Done: <strong>{paymentDoneCount}</strong>
+          </div>
         </div>
 
+        {/* Filters */}
         <div
           style={{
             display: 'flex',
@@ -163,7 +219,13 @@ function AdminEarnings({ onClose }) {
             marginBottom: '20px',
           }}
         >
-          {['All', 'Pending', 'Approved', 'Rejected'].map((status) => (
+          {[
+            'All',
+            'Pending',
+            'Approved',
+            'Rejected',
+            'Payment Done',
+          ].map((status) => (
             <button
               key={status}
               type="button"
@@ -181,11 +243,21 @@ function AdminEarnings({ onClose }) {
             </button>
           ))}
 
-          <button type="button" onClick={fetchRequests}>
+          <button
+            type="button"
+            onClick={fetchRequests}
+            style={{
+              padding: '9px 15px',
+              border: 'none',
+              borderRadius: '7px',
+              cursor: 'pointer',
+            }}
+          >
             🔄 Refresh
           </button>
         </div>
 
+        {/* Request list */}
         {loading ? (
           <p>Loading earning requests...</p>
         ) : filteredRequests.length === 0 ? (
@@ -217,17 +289,37 @@ function AdminEarnings({ onClose }) {
                 <p><strong>Image ID:</strong> {request.image_id}</p>
 
                 <p>
-                  <strong>Date:</strong>{' '}
-                  {new Date(request.created_at).toLocaleString()}
+                  <strong>Request Date:</strong>{' '}
+                  {formatDate(request.created_at)}
                 </p>
+
+                {request.paid_at && (
+                  <p>
+                    <strong>Payment Date:</strong>{' '}
+                    {formatDate(request.paid_at)}
+                  </p>
+                )}
+
+                {request.rejected_at && (
+                  <p>
+                    <strong>Rejection Date:</strong>{' '}
+                    {formatDate(request.rejected_at)}
+                  </p>
+                )}
 
                 <p>
                   <strong>Status:</strong>{' '}
-                  <span style={{ fontWeight: 'bold' }}>
+                  <span
+                    style={{
+                      fontWeight: 'bold',
+                      color: statusColor(request.status),
+                    }}
+                  >
                     {request.status}
                   </span>
                 </p>
 
+                {/* Pending actions */}
                 {request.status === 'Pending' && (
                   <div
                     style={{
@@ -239,35 +331,65 @@ function AdminEarnings({ onClose }) {
                     <button
                       type="button"
                       disabled={updatingId === request.id}
-                      onClick={() => updateStatus(request.id, 'Approved')}
+                      onClick={() =>
+                        updateStatus(request.id, 'Approved')
+                      }
                       style={{
-                        padding: '9px 14px',
+                        ...buttonStyle,
                         background: '#198754',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
                       }}
                     >
-                      {updatingId === request.id ? 'Updating...' : 'Approve'}
+                      {updatingId === request.id
+                        ? 'Updating...'
+                        : 'Approve'}
                     </button>
 
                     <button
                       type="button"
                       disabled={updatingId === request.id}
-                      onClick={() => updateStatus(request.id, 'Rejected')}
+                      onClick={() =>
+                        updateStatus(request.id, 'Rejected')
+                      }
                       style={{
-                        padding: '9px 14px',
+                        ...buttonStyle,
                         background: '#dc3545',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
                       }}
                     >
-                      {updatingId === request.id ? 'Updating...' : 'Reject'}
+                      {updatingId === request.id
+                        ? 'Updating...'
+                        : 'Reject'}
                     </button>
                   </div>
+                )}
+
+                {/* Approved request payment action */}
+                {request.status === 'Approved' && (
+                  <button
+                    type="button"
+                    disabled={updatingId === request.id}
+                    onClick={() => markPaymentDone(request.id)}
+                    style={{
+                      ...buttonStyle,
+                      background: '#087f5b',
+                      marginTop: '8px',
+                    }}
+                  >
+                    {updatingId === request.id
+                      ? 'Updating...'
+                      : '✓ Mark Payment Done'}
+                  </button>
+                )}
+
+                {request.status === 'Payment Done' && (
+                  <p
+                    style={{
+                      color: '#087f5b',
+                      fontWeight: 'bold',
+                      marginTop: '12px',
+                    }}
+                  >
+                    ✓ Payment completed successfully
+                  </p>
                 )}
               </div>
             ))}

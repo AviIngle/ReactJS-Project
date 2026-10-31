@@ -4,13 +4,18 @@ import './App.css';
 
 import Card from './Card';
 import Header from './Header';
+
 import Herosectio from './Herosectio';
 import Auth from './Auth';
 import AdminSettings from './AdminSettings';
 import AdminEarnings from './AdminEarnings';
 import { supabase } from './supabase';
-
-function App() {
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import About from './About';
+import Services from './Services';
+import Contact from './Contact';
+import Footer from "./Footer";
+function HomePage() {
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -23,6 +28,7 @@ function App() {
   const [likedImageIds, setLikedImageIds] = useState([]);
   const [busyLikeIds, setBusyLikeIds] = useState([]);
   const [earningRequestedIds, setEarningRequestedIds] = useState([]);
+  const [earningRequestStatuses, setEarningRequestStatuses] = useState({});
 
   const [settings, setSettings] = useState({
     likes_target: 100,
@@ -158,13 +164,13 @@ function App() {
     setLikedImageIds((actions || []).map((action) => action.image_id));
   };
 
-  // Fetch earning requests already submitted by this user
+  // Fetch earning requests and their latest status from Supabase
   const fetchEarningRequests = async () => {
     if (!session?.user?.id) return;
 
     const { data: requests, error } = await supabase
       .from('earning_requests')
-      .select('image_id')
+      .select('image_id, status')
       .eq('user_id', session.user.id);
 
     if (error) {
@@ -172,9 +178,13 @@ function App() {
       return;
     }
 
-    setEarningRequestedIds(
-      (requests || []).map((request) => request.image_id)
-    );
+    const statusMap = {};
+    (requests || []).forEach((request) => {
+      statusMap[request.image_id] = request.status;
+    });
+
+    setEarningRequestStatuses(statusMap);
+    setEarningRequestedIds(Object.keys(statusMap));
   };
 
   // Load data after login
@@ -188,6 +198,7 @@ function App() {
       setUploadedImages([]);
       setLikedImageIds([]);
       setEarningRequestedIds([]);
+      setEarningRequestStatuses({});
     }
   }, [session]);
 
@@ -221,7 +232,7 @@ function App() {
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
+    if (file.size > 6 * 1024 * 1024) {
       alert('Image size 2 MB se kam honi chahiye!');
       return;
     }
@@ -563,6 +574,8 @@ function App() {
               sharesTarget={settings.shares_target}
               rewardAmount={settings.reward_amount}
               earningRequested={earningRequestedIds.includes(ele.id)}
+              earningRequestStatus={earningRequestStatuses[ele.id] || null}
+              onRefreshEarningStatus={fetchEarningRequests}
               onLike={() => handleLike(ele)}
               onDownload={() => handleDownload(ele)}
               onShare={() => handleShare(ele)}
@@ -578,4 +591,23 @@ function App() {
   );
 }
 
+
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      <Footer />
+    </BrowserRouter>
+  );
+}
+
 export default App;
+

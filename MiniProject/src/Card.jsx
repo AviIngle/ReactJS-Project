@@ -277,7 +277,10 @@ function Card(props) {
       {props.canDelete && (
         <button
           type="button"
-          onClick={() => setShowEarningPopup(true)}
+          onClick={async () => {
+            await props.onRefreshEarningStatus?.();
+            setShowEarningPopup(true);
+          }}
           style={{
             width: '100%',
             marginTop: '15px',
@@ -400,10 +403,30 @@ function Card(props) {
                   </p>
                 )}
 
-                {props.earningRequested ? (
-                  <p className="earning-pending">
-                    Your earning request is already submitted. Status: Pending.
-                  </p>
+                {props.earningRequestStatus ? (
+                  <div
+                    style={{
+                      marginTop: '15px',
+                      padding: '12px',
+                      borderRadius: '10px',
+                      textAlign: 'center',
+                      background:
+                        props.earningRequestStatus === 'Approved'
+                          ? '#dcfce7'
+                          : props.earningRequestStatus === 'Rejected'
+                            ? '#fee2e2'
+                            : '#fef3c7',
+                      color:
+                        props.earningRequestStatus === 'Approved'
+                          ? '#166534'
+                          : props.earningRequestStatus === 'Rejected'
+                            ? '#991b1b'
+                            : '#92400e',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    Earning Request Status: {props.earningRequestStatus}
+                  </div>
                 ) : (
                   <button
                     type="button"
